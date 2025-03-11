@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+<head>
+   <meta charset="utf-8">
+   <title>Verify OTP | AI Summarizer</title>
+   <link rel="stylesheet" href="../static/otp.css">
+   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/css/all.min.css"/>
+</head>
+<body>
+   <div class="content">
+      <div class="text">
+         Verify OTP
+      </div>
+      <form action="#">
+         <div class="otp-field">
+            <input type="text" maxlength="1" required>
+            <input type="text" maxlength="1" required>
+            <input type="text" maxlength="1" required>
+            <input type="text" maxlength="1" required>
+            <input type="text" maxlength="1" required>
+            <input type="text" maxlength="1" required>
+         </div>
+         <button>Verify</button>
+         <div class="resend-otp">
+            Didn't receive the code?
+            <a href="#">Resend OTP</a>
+         </div>
+      </form>
+   </div>
+
+   <script>
+      const inputs = document.querySelectorAll('.otp-field input');
+
+      inputs.forEach((input, index) => {
+         input.addEventListener('input', (e) => {
+            const currentInput = e.target;
+            const nextInput = inputs[index + 1];
+
+            if (currentInput.value && nextInput) {
+               nextInput.focus();
+            }
+         });
+
+         input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && input.value === '' && index !== 0) {
+               inputs[index - 1].focus();
+            }
+         });
+      });
+   </script>
+</body>
+</html>
