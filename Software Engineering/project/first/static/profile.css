@@ -1,0 +1,393 @@
+/* CSS Variables */
+:root {
+    --primary-color: #4a6bff;
+    --secondary-color: #00e1ff;
+    --accent-color: #ff6b6b;
+    --dark-bg: rgba(10, 25, 70, 0.9);
+    --text-light: #ffffff;
+    --text-dark: #333333;
+    --card-bg: #f8f9fa;
+    --card-text: #495057;
+    --input-bg: #ffffff;
+    --error-color: #ff4444;
+    --success-color: #00c851;
+    --info-color: #33b5e5;
+  }
+  
+  /* Base Styles */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Poppins', sans-serif;
+  }
+  
+  body {
+    overflow-x: hidden;
+    min-height: 100vh;
+    background: linear-gradient(135deg, #1a2a6c, #4a6bff, #00e1ff);
+    color: var(--text-light);
+    background-attachment: fixed;
+    position: relative;
+  }
+  
+  .toolbar {
+    position: fixed;
+    top: 0;
+    width: 100%;
+    background: var(--dark-bg);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 30px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backdrop-filter: blur(10px);
+    z-index: 1000;
+  }
+  
+  .logo {
+    font-size: 1.8rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+  }
+  
+  .logo-icon {
+    color: var(--text-light);
+  }
+  
+  .logo-highlight {
+    color: var(--secondary-color);
+    font-weight: 700;
+  }
+  
+  /* Profile Container */
+  .profile-container {
+    display: flex;
+    max-width: 1200px;
+    margin: 100px auto 50px;
+    background: var(--card-bg);
+    border-radius: 15px;
+    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
+    overflow: hidden;
+    position: relative;
+    z-index: 2;
+    min-height: 70vh;
+  }
+  
+  /* Profile Sidebar */
+  .profile-sidebar {
+    width: 300px;
+    padding: 30px;
+    background: rgba(248, 249, 250, 0.9);
+    border-right: 1px solid #eee;
+  }
+  
+  .profile-header {
+    text-align: center;
+    margin-bottom: 30px;
+  }
+  
+  .profile-pic {
+    width: 120px;
+    height: 120px;
+    margin: 0 auto 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 120px;
+    color: var(--primary-color);
+  }
+  
+  .profile-header h2 {
+    font-size: 1.5rem;
+    color: var(--card-text);
+    margin-bottom: 5px;
+  }
+  
+  .user-email {
+    color: #6c757d;
+    font-size: 0.9rem;
+  }
+  
+  .user-info {
+    margin-top: 30px;
+  }
+  
+  .info-item {
+    margin-bottom: 20px;
+  }
+  
+  .info-label {
+    font-size: 0.85rem;
+    color: #6c757d;
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .info-value {
+    background: var(--input-bg);
+    padding: 10px 15px;
+    border-radius: 8px;
+    color: var(--card-text);
+    font-weight: 500;
+    border: 1px solid #eee;
+  }
+  
+  /* PDF Content */
+  .pdf-content {
+    flex: 1;
+    padding: 30px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .content-header {
+    margin-bottom: 25px;
+  }
+  
+  .tabs {
+    display: flex;
+    margin-bottom: 20px;
+    border-bottom: 1px solid #eee;
+  }
+  
+  .tab {
+    padding: 10px 20px;
+    cursor: pointer;
+    color: #6c757d;
+    font-weight: 500;
+    position: relative;
+  }
+  
+  .tab.active {
+    color: var(--primary-color);
+  }
+  
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: var(--primary-color);
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    color: var(--card-text);
+    font-weight: 600;
+    margin-bottom: 20px;
+  }
+  
+  .documents-container {
+    flex: 1;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 20px;
+    overflow-y: auto;
+    padding-right: 10px;
+  }
+  
+  .document-card {
+    background: var(--input-bg);
+    border-radius: 10px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    border: 1px solid #eee;
+    transition: all 0.3s ease;
+  }
+  
+  .document-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+  }
+  
+  .document-icon {
+    font-size: 2.5rem;
+    color: #e74c3c;
+    margin-bottom: 15px;
+  }
+  
+  .document-details {
+    flex: 1;
+  }
+  
+  .document-name {
+    font-size: 1rem;
+    color: var(--card-text);
+    margin-bottom: 5px;
+    font-weight: 500;
+  }
+  
+  .document-date {
+    font-size: 0.8rem;
+    color: #6c757d;
+  }
+  
+  .document-actions {
+    display: flex;
+    gap: 10px;
+    margin-top: 15px;
+  }
+  
+  .action-btn {
+    flex: 1;
+    padding: 8px 12px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+    transition: all 0.2s ease;
+  }
+  
+  .view-btn {
+    background: rgba(74, 107, 255, 0.1);
+    color: var(--primary-color);
+  }
+  
+  .view-btn:hover {
+    background: rgba(74, 107, 255, 0.2);
+  }
+  
+  .download-btn {
+    background: var(--primary-color);
+    color: white;
+  }
+  
+  .download-btn:hover {
+    background: #3a5bff;
+  }
+  
+  .empty-state {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px;
+    color: #6c757d;
+  }
+  
+  .empty-state i {
+    font-size: 3rem;
+    margin-bottom: 15px;
+    color: #adb5bd;
+  }
+  
+  /* PDF Viewer Modal */
+  .modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.8);
+    z-index: 2000;
+  }
+  
+  .modal-content {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 90%;
+    height: 90%;
+    background: white;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  
+  .close-btn {
+    position: absolute;
+    top: 15px;
+    right: 20px;
+    font-size: 30px;
+    color: #aaa;
+    cursor: pointer;
+    z-index: 2001;
+    transition: all 0.2s ease;
+  }
+  
+  .close-btn:hover {
+    color: #333;
+  }
+  
+  #pdf-viewer {
+    width: 100%;
+    height: 100%;
+  }
+  
+  /* Particles Background */
+  .particles {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+  }
+  
+  .particle {
+    position: absolute;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    animation: float linear infinite;
+    opacity: 0.6;
+  }
+  
+  @keyframes float {
+    0% {
+        transform: translateY(0) translateX(0);
+        opacity: 0;
+    }
+    50% {
+        opacity: 0.8;
+    }
+    100% {
+        transform: translateY(-100vh) translateX(20px);
+        opacity: 0;
+    }
+  }
+  
+  /* Responsive Design */
+  @media (max-width: 992px) {
+    .profile-container {
+      flex-direction: column;
+      margin: 100px 20px 50px;
+    }
+    
+    .profile-sidebar {
+      width: 100%;
+      border-right: none;
+      border-bottom: 1px solid #eee;
+    }
+    
+    .documents-container {
+      grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    }
+  }
+  
+  @media (max-width: 576px) {
+    .documents-container {
+      grid-template-columns: 1fr;
+    }
+    
+    .document-actions {
+      flex-direction: column;
+    }
+    
+    .modal-content {
+      width: 95%;
+      height: 95%;
+    }
+  }

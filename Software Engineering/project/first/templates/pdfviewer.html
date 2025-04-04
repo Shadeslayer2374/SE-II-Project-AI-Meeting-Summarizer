@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Generated Report | EchoAI</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'pdfviewer.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="toolbar">
+        <div class="logo">
+            <span class="logo-icon">Echo</span><span class="logo-highlight">AI</span>
+        </div>
+    </div>
+    
+    <div class="main-container">
+        <div class="pdf-header">
+            <div class="header-content">
+                <h1>Generated Report</h1>
+                <p>Your summarized content is ready to view</p>
+            </div>
+            
+            <div class="action-buttons">
+                <button class="action-btn back-btn" onclick="window.history.back()">
+                    <i class="fas fa-arrow-left"></i> Back
+                </button>
+                <button class="action-btn download-btn" onclick="downloadPDF()">
+                    <i class="fas fa-download"></i> Download PDF
+                </button>
+            </div>
+        </div>
+
+        <div id="status-container">
+            <!-- Status messages will appear here -->
+        </div>
+
+        <div class="pdf-viewer-container" id="pdf-viewer-container"></div>
+    </div>
+    
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+    
+    <!-- PDF.js Library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.min.js"></script>
+    <script>
+        // Set PDF.js worker path
+        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.11.338/pdf.worker.min.js';
+
+        // Get file ID from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const fileId = urlParams.get('file_id');
+        let pdfUrl = `/download_pdf/${fileId}/`;
+
+        // Check file status and display PDF
+        checkFileStatus();
+
+        function checkFileStatus() {
+            const statusContainer = document.getElementById('status-container');
+            
+            // Show loading state
+            statusContainer.innerHTML = `
+                <div class="status processing">
+                    <div class="spinner"></div>
+                    <p>Generating your PDF, please wait...</p>
+                </div>
+            `;
+
+            // Check status every 3 seconds
+            const statusInterval = setInterval(() => {
+                fetch(`/check_pdf_status/${fileId}/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.status === 'ready') {
+                            clearInterval(statusInterval);
+                            loadPDF();
+                        } else if (data.status === 'failed') {
+                            clearInterval(statusInterval);
+                            statusContainer.innerHTML = `
+                                <div class="status error">
+                                    <i class="fas fa-exclamation-circle"></i>
+                                    <p>Error generating PDF: ${data.message || 'Unknown error'}</p>
+                                </div>
+                            `;
+                        }
+                        // If still processing, the loading message remains
+                    })
+                    .catch(error => {
+                        clearInterval(statusInterval);
+                        statusContainer.innerHTML = `
+                            <div class="status error">
+                                <i class="fas fa-exclamation-circle"></i>
+                                <p>Error checking status: ${error.message}</p>
+                            </div>
+                        `;
+                    });
+            }, 3000);
+        }
+
+        function loadPDF() {
+            const statusContainer = document.getElementById('status-container');
+            statusContainer.innerHTML = '';
+            
+            // Load the PDF document
+            pdfjsLib.getDocument(pdfUrl).promise
+                .then(pdf => {
+                    // Get the first page
+                    return pdf.getPage(1);
+                })
+                .then(page => {
+                    const scale = 1.5;
+                    const viewport = page.getViewport({ scale });
+
+                    // Prepare canvas
+                    const canvas = document.createElement('canvas');
+                    const context = canvas.getContext('2d');
+                    canvas.height = viewport.height;
+                    canvas.width = viewport.width;
+
+                    // Render PDF page into canvas context
+                    const renderContext = {
+                        canvasContext: context,
+                        viewport: viewport
+                    };
+
+                    const renderTask = page.render(renderContext);
+                    return renderTask.promise.then(() => {
+                        // Add canvas to the container
+                        const container = document.getElementById('pdf-viewer-container');
+                        container.innerHTML = '';
+                        container.appendChild(canvas);
+                    });
+                })
+                .catch(error => {
+                    statusContainer.innerHTML = `
+                        <div class="status error">
+                            <i class="fas fa-exclamation-circle"></i>
+                            <p>Error loading PDF: ${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+
+        function downloadPDF() {
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = `EchoAI_Report_${fileId}.pdf`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        // Create particles
+        document.addEventListener("DOMContentLoaded", function() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 5 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        });
+    </script>
+</body>
+</html>
