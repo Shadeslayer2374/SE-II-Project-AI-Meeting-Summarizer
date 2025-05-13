@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Profile | EchoAI</title>
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'profile.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="toolbar">
+        <div class="logo">
+            <span class="logo-icon">Echo</span><span class="logo-highlight">AI</span>
+        </div>
+    </div>
+    
+    <div class="profile-container">
+        <!-- Left Side - User Profile -->
+        <div class="profile-sidebar">
+            <div class="profile-header">
+                <div class="profile-pic">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <h2>{{ name }}</h2>
+                <p class="user-email">{{ email }}</p>
+            </div>
+            
+            <div class="user-info">
+                <div class="info-item">
+                    <div class="info-label">Phone</div>
+                    <div class="info-value">{{ phone }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Gender</div>
+                    <div class="info-value">{{ gender }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Member Since</div>
+                    <div class="info-value">{{ date }}</div>
+                </div>
+                
+                <div class="info-item">
+                    <div class="info-label">Total Uploads</div>
+                    <div class="info-value">{{ uploads }} PDFs</div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Right Side - PDF Content -->
+        <div class="pdf-content">
+            <div class="content-header">
+                <div class="tabs">
+                    <div class="tab active">My PDFs</div>
+                    <!-- <div class="tab">Favorites</div> -->
+                </div>
+                <h2 class="section-title">My Uploaded Documents</h2>
+            </div>
+            
+            <div class="documents-container">
+                {% for pdf in pdfs %}
+                <div class="pdf-card" id="pdf-card-{{ pdf.id }}">
+                    <div class="pdf-icon">
+                        <i class="fas fa-file-pdf"></i>
+                    </div>
+                    <div class="pdf-details">
+                        <h3 class="pdf-title">{{ pdf.name|truncatechars:25 }}</h3>
+                        <div class="pdf-meta">
+                            <span class="meta-item">
+                                <i class="far fa-calendar"></i> {{ pdf.created_at }}
+                            </span>
+                            <span class="meta-item">
+                                <i class="fas fa-file-alt"></i> {{ pdf.size }}
+                            </span>
+                        </div>
+                    </div>
+                    <div class="pdf-actions">
+                        <a href="{{ pdf.url }}" class="action-btn view-btn" target="_blank" title="View PDF">
+                            <i class="fas fa-eye"></i>
+                        </a>
+                        <a href="{{ pdf.url }}" class="action-btn download-btn" download title="Download PDF">
+                            <i class="fas fa-download"></i>
+                        </a>
+                        <button class="action-btn delete-btn" onclick="deletePdf('{{ pdf.id }}')" title="Delete PDF">
+                            <i class="fas fa-trash"></i>
+                        </button>
+                    </div>
+                </div>
+                {% empty %}
+                <div class="empty-state">
+                    <div class="empty-icon">
+                        <i class="far fa-file-pdf"></i>
+                    </div>
+                    <h3>No PDFs Found</h3>
+                    <p>Upload your first document to get started</p>
+                </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    
+    <!-- PDF Viewer Modal -->
+    <div class="modal" id="pdf-modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <iframe id="pdf-viewer" frameborder="0"></iframe>
+        </div>
+    </div>
+
+    <!-- Delete Confirmation Modal -->
+    <div class="modal" id="delete-modal">
+        <div class="modal-content">
+            <span class="close-btn" onclick="closeDeleteModal()">&times;</span>
+            <h3>Confirm Deletion</h3>
+            <p>Are you sure you want to delete this PDF? This action cannot be undone.</p>
+            <div class="modal-actions">
+                <button class="btn cancel-btn" onclick="closeDeleteModal()">Cancel</button>
+                <button class="btn delete-confirm-btn" id="confirm-delete-btn">Delete</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Particles Background -->
+    <div class="particles" id="particles"></div>
+    
+    <script>
+        // Current PDF to be deleted
+        let currentPdfToDelete = null;
+
+        // PDF Viewer Modal Functions
+        const modal = document.getElementById('pdf-modal');
+        const closeBtn = document.querySelector('.close-btn');
+
+        function openPdfViewer(pdfUrl) {
+            document.getElementById('pdf-viewer').src = pdfUrl + '#toolbar=0&navpanes=0';
+            modal.style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closePdfViewer() {
+            modal.style.display = 'none';
+            document.getElementById('pdf-viewer').src = '';
+            document.body.style.overflow = 'auto';
+        }
+
+        // Delete PDF Functions
+        function deletePdf(pdfId) {
+            currentPdfToDelete = pdfId;
+            document.getElementById('delete-modal').style.display = 'block';
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('delete-modal').style.display = 'none';
+            document.body.style.overflow = 'auto';
+            currentPdfToDelete = null;
+        }
+
+        document.getElementById('confirm-delete-btn').addEventListener('click', function() {
+            if (currentPdfToDelete) {
+                fetch(`/delete-pdf/${currentPdfToDelete}/`, {
+                    method: 'DELETE',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'X-CSRFToken': '{{ csrf_token }}',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    }
+                })
+                .then(response => {
+                    if (!response.ok) {
+                        return response.json().then(err => { throw err; });
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        // Remove PDF card from UI
+                        const pdfCard = document.getElementById(`pdf-card-${currentPdfToDelete}`);
+                        if (pdfCard) {
+                            pdfCard.remove();
+                        }
+                        
+                        // Update uploads count in UI
+                        const uploadsCount = document.querySelector('.info-value:last-child');
+                        if (uploadsCount && data.new_uploads_count !== undefined) {
+                            uploadsCount.textContent = `${data.new_uploads_count} PDFs`;
+                        }
+                    }
+                    closeDeleteModal();
+                })
+                .catch(error => {
+                    console.error('Delete error:', error);
+                    alert(`Delete failed: ${error.message || 'Unknown error'}`);
+                    closeDeleteModal();
+                });
+            }
+        });
+
+        // PDF Download Function
+        function downloadPdf(pdfUrl, pdfName) {
+            const link = document.createElement('a');
+            link.href = pdfUrl;
+            link.download = pdfName || 'document.pdf';
+            
+            const csrfToken = "{{ csrf_token }}";
+            if (csrfToken) {
+                link.setAttribute('data-csrf', csrfToken);
+            }
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            trackDownload(pdfUrl);
+        }
+
+        // Optional download tracking
+        function trackDownload(pdfUrl) {
+            fetch('/api/track-download/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token }}'
+                },
+                body: JSON.stringify({ pdf_url: pdfUrl })
+            })
+            .catch(error => console.error('Download tracking failed:', error));
+        }
+
+        // Close modals when clicking outside content
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    if (modal.id === 'pdf-modal') {
+                        closePdfViewer();
+                    } else if (modal.id === 'delete-modal') {
+                        closeDeleteModal();
+                    }
+                }
+            });
+        });
+
+        // Close modals when pressing Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (document.getElementById('pdf-modal').style.display === 'block') {
+                    closePdfViewer();
+                } else if (document.getElementById('delete-modal').style.display === 'block') {
+                    closeDeleteModal();
+                }
+            }
+        });
+
+        // Create particles
+        document.addEventListener("DOMContentLoaded", function() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 20;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                const size = Math.random() * 5 + 2;
+                const posX = Math.random() * 100;
+                const posY = Math.random() * 100;
+                const delay = Math.random() * 5;
+                const duration = Math.random() * 10 + 10;
+                
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                particle.style.left = `${posX}%`;
+                particle.style.top = `${posY}%`;
+                particle.style.animationDelay = `${delay}s`;
+                particle.style.animationDuration = `${duration}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        });
+    </script>
+</body>
+</html>
